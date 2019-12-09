@@ -27,6 +27,9 @@ First, you need to plan.
 - Your team needs to use the official SQL script (see below) and use the ERD provided.
 - Read all of the tickets. They're in order of priority. This is a week long sprint, and you're in charge of deciding how many tickets you want to take on. When you've decided, one of your lead devs will come around for a commitment ceremony.
 
+## Restore Packages
+
+When you clone down this boilerplate code, run `dotnet restore` twice-- first in the API project and second in the Test project to restore all of the dependencies. Your app will not run without this step.
 
 ## Modeling
 
