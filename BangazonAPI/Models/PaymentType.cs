@@ -10,6 +10,6 @@ namespace BangazonAPI.Models
         public int id { get; set; }
         public int accountNumber { get; set; }
         public string name { get; set; }
-        public Customer Customer { get; set; }
+        public Customer customer { get; set; }
     }
 }
