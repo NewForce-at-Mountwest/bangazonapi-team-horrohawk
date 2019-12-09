@@ -37,7 +37,7 @@ Next, you need to author the Models needed for your API. Make sure that each mod
 
 ## Database Management
 
-You will be using the [Official Bangazon SQL](./BangazonAPI/bangazon.sql) file to create your database. Name the database `BangazonAPI`. Create the database using the SQL Server Object Explorer in Visual Studio and then run the provided SQL file on the new database. Every team member will need to build the database on their own computer.
+You will be using the [Official Bangazon SQL](./BangazonAPI/bangazon-api.sql) file to create your database. Name the database `BangazonAPI`. Create the database using the SQL Server Object Explorer in Visual Studio and then run the provided SQL file on the new database. Every team member will need to build the database on their own computer.
 
 ## Controllers
 
