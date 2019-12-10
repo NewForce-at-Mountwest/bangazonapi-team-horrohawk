@@ -38,7 +38,7 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Id, Name, AcctNumber FROM PaymentType";
+                    cmd.CommandText = @"SELECT Id, Name, AcctNumber, CustomerId FROM PaymentType";
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<PaymentType> paymentTypes = new List<PaymentType>();
 
@@ -48,7 +48,8 @@ namespace BangazonAPI.Controllers
                         {
                             id = reader.GetInt32(reader.GetOrdinal("Id")),
                             accountNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
-                            name = reader.GetString(reader.GetOrdinal("Name"))
+                            name = reader.GetString(reader.GetOrdinal("Name")),
+                            customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
 
                         };
                         
@@ -73,7 +74,7 @@ namespace BangazonAPI.Controllers
                 {
                     cmd.CommandText = @"
                         SELECT
-                            Id, Name, AcctNumber
+                            Id, Name, AcctNumber, CustomerId
                         FROM PaymentType
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
@@ -87,7 +88,8 @@ namespace BangazonAPI.Controllers
                         {
                             id = reader.GetInt32(reader.GetOrdinal("Id")),
                             accountNumber = reader.GetInt32(reader.GetOrdinal("AcctNumber")),
-                            name = reader.GetString(reader.GetOrdinal("Name"))
+                            name = reader.GetString(reader.GetOrdinal("Name")),
+                            customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                         };
                     }
                     reader.Close();
@@ -105,15 +107,16 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO PaymentType (Name, AcctNumber)
+                    cmd.CommandText = @"INSERT INTO PaymentType (Name, AcctNumber, CustomerId)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@name, accountNumber)";
-                    cmd.Parameters.Add(new SqlParameter("@name", currentPayment.name));
-                    cmd.Parameters.Add(new SqlParameter("@accoutNumber", currentPayment.accountNumber));
+                                        VALUES (@Name, @AcctNumber, @CustomerId)";
+                    cmd.Parameters.Add(new SqlParameter("@Name", currentPayment.name));
+                    cmd.Parameters.Add(new SqlParameter("@AcctNumber", currentPayment.accountNumber));
+                    cmd.Parameters.Add(new SqlParameter("@CustomerId", currentPayment.customerId));
 
                     int newId = (int)cmd.ExecuteScalar();
                     currentPayment.id = newId;
-                    return CreatedAtRoute("Get", new { id = newId }, currentPayment);
+                    return CreatedAtRoute("GetPaymentType", new { id = newId }, currentPayment);
                 }
             }
         }
@@ -129,11 +132,13 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE PaymentType
-                                            SET Name = @name,
-                                            SET AcctNumber = @acctNumber
+                                            SET Name = @Name,
+                                             AcctNumber = @AcctNumber,
+                                             CustomerId = @CustomerId
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@name", newPaymentType.name));
-                        cmd.Parameters.Add(new SqlParameter("@acctNumber", newPaymentType.accountNumber));
+                        cmd.Parameters.Add(new SqlParameter("@Name", newPaymentType.name));
+                        cmd.Parameters.Add(new SqlParameter("@AcctNumber", newPaymentType.accountNumber));
+                        cmd.Parameters.Add(new SqlParameter("@CustomerId", newPaymentType.customerId));
                         cmd.Parameters.Add(new SqlParameter("@id", id));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
