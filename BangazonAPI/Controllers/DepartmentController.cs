@@ -31,7 +31,7 @@ namespace BangazonAPI.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> Get(string include, string q)
+        public async Task<IActionResult> Get(string _filter, int _gt, string _include)
         {
             using (SqlConnection conn = Connection)
             {
@@ -40,17 +40,18 @@ namespace BangazonAPI.Controllers
                 {
                     string query = "SELECT Department.Id AS 'Department Id', Department.Name AS 'Department Name', Department.Budget AS 'Department Budget' FROM Department";
 
-                    if (include == "employees")
+                    if (_include == "employees")
                     {
                         query = @"SELECT Department.Id AS 'Department Id', Department.Name AS 'Department Name', Department.Budget AS 'Department Budget', Employee.Id AS 'Employee Id', Employee.FirstName AS 'Employee First Name', Employee.LastName AS 'Employee Last Name', Employee.DepartmentId AS 'Employee Department', Employee.IsSuperVisor AS 'Supervisor Status' FROM Department RIGHT JOIN Employee ON Department.Id=Employee.DepartmentId";
                     }
 
-                    if (q != null)
+                    if (_filter == "budget")
                     {
-                        //query = greater than the budget number here;
+                        query += $" WHERE Department.Budget >= '{_gt}'";
                     }
 
 
+                    
                     cmd.CommandText = query;
                     SqlDataReader reader = cmd.ExecuteReader();
                     List<Department> departments = new List<Department>();
@@ -65,7 +66,12 @@ namespace BangazonAPI.Controllers
 
                         };
 
-                        if (include == "employees")
+                        if (_filter == "budget")
+                            {
+                                departments.Add(singleDept);
+                            };
+
+                        if (_include == "employees")
 
                         {
                             Employee currentEmployee = new Employee
@@ -89,17 +95,14 @@ namespace BangazonAPI.Controllers
                             {
                                 singleDept.employees.Add(currentEmployee);
                                 departments.Add(singleDept);
-
                             }
-
                         }
-                        else
-                        {
-                            departments.Add(singleDept);
-                        }
+                        //else
+                        //{
+                        //    departments.Add(singleDept);
+                        //}
 
 
-                        departments.Add(singleDept);
                     }
                     reader.Close();
 
@@ -108,7 +111,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        [HttpGet("{id}", Name = "GetStudent")]
+        [HttpGet("{id}", Name = "GetDepartment")]
         public async Task<IActionResult> Get([FromRoute] int id)
         {
             using (SqlConnection conn = Connection)
@@ -116,61 +119,54 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"SELECT Student.Id, Student.FirstName, Student.LastName, Student.SlackHandle, Student.CohortId, Cohort.Name FROM Student JOIN Cohort ON Student.CohortId=Cohort.Id
-                        WHERE Student.Id = @id";
+                    cmd.CommandText = @"SELECT Department.Id AS 'Department Id', Department.Name AS 'Department Name', Department.Budget AS 'Department Budget' FROM Department
+                        WHERE Department.Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
                     SqlDataReader reader = cmd.ExecuteReader();
 
-                    Student student = null;
+                    Department department = null;
 
                     if (reader.Read())
                     {
-                        student = new Student
+                        department = new Department
                         {
-                            Id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            FirstName = reader.GetString(reader.GetOrdinal("FirstName")),
-                            LastName = reader.GetString(reader.GetOrdinal("LastName")),
-                            SlackHandle = reader.GetString(reader.GetOrdinal("SlackHandle")),
-                            CohortId = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                            Cohort = new Cohort
-                            {
-                                Id = reader.GetInt32(reader.GetOrdinal("CohortId")),
-                                Name = reader.GetString(reader.GetOrdinal("Name"))
-                            }
+                            id = reader.GetInt32(reader.GetOrdinal("Department Id")),
+                            name = reader.GetString(reader.GetOrdinal("Department Name")),
+                            budget = reader.GetInt32(reader.GetOrdinal("Department Budget"))
+                            
                         };
                     }
                     reader.Close();
 
-                    return Ok(student);
+                    return Ok(department);
                 }
             }
         }
 
         [HttpPost]
-        public async Task<IActionResult> Post([FromBody] Student student)
+        public async Task<IActionResult> Post([FromBody] Department department)
         {
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Student (FirstName, LastName, SlackHandle, CohortId)
+                    cmd.CommandText = @"INSERT INTO Department (Id, Name, Budget)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@firstname, @lastname, @slackhandle, @cohortId)";
-                    cmd.Parameters.Add(new SqlParameter("@firstname", student.FirstName));
-                    cmd.Parameters.Add(new SqlParameter("@lastname", student.LastName));
-                    cmd.Parameters.Add(new SqlParameter("@slackhandle", student.SlackHandle));
-                    cmd.Parameters.Add(new SqlParameter("@cohortId", student.CohortId));
+                                        VALUES (@id, @name, @budget)";
+                    cmd.Parameters.Add(new SqlParameter("@id", department.id));
+                    cmd.Parameters.Add(new SqlParameter("@name", department.name));
+                    cmd.Parameters.Add(new SqlParameter("@budget", department.budget));
 
                     int newId = (int)cmd.ExecuteScalar();
-                    student.Id = newId;
-                    return CreatedAtRoute("GetStudent", new { id = newId }, student);
+                    department.id = newId;
+                    return CreatedAtRoute("GetDepartment", new { id = newId }, department);
                 }
             }
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Student student)
+        public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Department department)
         {
             try
             {
@@ -179,17 +175,14 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        cmd.CommandText = @"UPDATE Student
-                                            SET FirstName = @firstname,
-                                                LastName = @lastname,
-                                                SlackHandle = @slackhandle,
-                                                CohortId = @cohortId
+                        cmd.CommandText = @"UPDATE Department
+                                            SET Id = @id,
+                                                Name = @name,
+                                                Budget = @budget
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@firstname", student.FirstName));
-                        cmd.Parameters.Add(new SqlParameter("@lastname", student.LastName));
-                        cmd.Parameters.Add(new SqlParameter("@slackhandle", student.SlackHandle));
-                        cmd.Parameters.Add(new SqlParameter("@cohortId", student.CohortId));
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        cmd.Parameters.Add(new SqlParameter("@id", department.id));
+                        cmd.Parameters.Add(new SqlParameter("@name", department.name));
+                        cmd.Parameters.Add(new SqlParameter("@budget", department.budget));
 
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
@@ -202,7 +195,7 @@ namespace BangazonAPI.Controllers
             }
             catch (Exception)
             {
-                if (!StudentExists(id))
+                if (!DepartmentExists(id))
                 {
                     return NotFound();
                 }
@@ -213,42 +206,7 @@ namespace BangazonAPI.Controllers
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
-        {
-            try
-            {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
-                        }
-                        throw new Exception("No rows affected");
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                if (!StudentExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
-
-        private bool StudentExists(int id)
+        private bool DepartmentExists(int id)
         {
             using (SqlConnection conn = Connection)
             {
@@ -256,8 +214,8 @@ namespace BangazonAPI.Controllers
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     cmd.CommandText = @"
-                        SELECT Id, FirstName, LastName, SlackHandle, CohortId
-                        FROM Student
+                        SELECT Id, Name, Budget
+                        FROM Department
                         WHERE Id = @id";
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
