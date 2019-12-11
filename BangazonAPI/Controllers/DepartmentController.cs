@@ -71,6 +71,10 @@ namespace BangazonAPI.Controllers
                                 departments.Add(singleDept);
                             };
 
+                        if(_filter==null && _include==null){
+                            departments.Add(singleDept);
+                        };
+
                         if (_include == "employees")
 
                         {
@@ -97,10 +101,10 @@ namespace BangazonAPI.Controllers
                                 departments.Add(singleDept);
                             }
                         }
-                        else
-                        {
-                            departments.Add(singleDept);
-                        }
+                        //else
+                        //{
+                        //    departments.Add(singleDept);
+                        //}
 
 
                     }
