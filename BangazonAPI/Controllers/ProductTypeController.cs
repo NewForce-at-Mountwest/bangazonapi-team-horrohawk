@@ -166,9 +166,48 @@ namespace BangazonAPI.Controllers
         }
 
         // delete the product type only of there are no associated products
-        // check to see if the product type by id includes any products
-        // if products exist with product type then send error message
-        // if no associated products exist then delete the product type
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> Delete([FromRoute] int id)
+        {
+            // check to see if the product type by id includes any products
+
+            try
+            {
+                using (SqlConnection conn = Connection)
+                {
+                    conn.Open();
+                    using (SqlCommand cmd = conn.CreateCommand())    
+                        // if products exist with product type then send error message
+
+                        cmd.CommandText = @"SELECT ProductType.Id AS 'ProductType Id', Product.Id AS 'Product Id', Product.ProductTypeId
+FROM ProductType JOIN Product ON Product.ProductTypeId = ProductType.Id WHERE ProductTypeId = id ";
+
+                    // if no associated products exist then delete the product type
+
+                    cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                        int rowsAffected = cmd.ExecuteNonQuery();
+                        if (rowsAffected > 0)
+                        {
+                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                        }
+                        throw new Exception("No rows affected");
+                 }
+                
+            }
+            catch (Exception)
+            {
+                if (!ProductTypeExists(id))
+                {
+                    return NotFound();
+                }
+                else
+                {
+                    throw;
+                }
+            }
+        }
 
         private bool ProductTypeExists(int id)
         {
