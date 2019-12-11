@@ -12,6 +12,9 @@
 *.user
 *.sln.docstates
 
+# ignore a single file
+appsetting.json.test
+
 # Build results
 [Dd]ebug/
 [Rr]elease/
