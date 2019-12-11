@@ -47,7 +47,7 @@ FROM Customer ";
                     if (include == "products")
                     {
                         query = @"SELECT Customer.Id AS 'Customer Id', Customer.FirstName, Customer.LastName,
-Product.Id AS 'Product Id', Product.Title, Product.Description, Product.Quantity  FROM Customer JOIN Product ON Product.CustomerId = Customer.Id";
+Product.Id AS 'Product Id', Product.Title, Product.Description, Product.Quantity, Product.Price  FROM Customer JOIN Product ON Product.CustomerId = Customer.Id";
                     }
                     //query to bring back list of payment types with cutomer if include=payments
                     if (include == "payments")
@@ -81,7 +81,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             {
                                 id = reader.GetInt32(reader.GetOrdinal("Product Id")),
                                 title = reader.GetString(reader.GetOrdinal("Title")),
-                                price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                price = reader.GetDecimal(reader.GetOrdinal("Price")),
                                 quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                                 description = reader.GetString(reader.GetOrdinal("Description"))
                             };
