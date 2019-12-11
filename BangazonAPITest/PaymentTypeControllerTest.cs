@@ -101,7 +101,7 @@ namespace BangazonAPITest
         {
             // Note: with many of these methods, I'm creating dummy data and then testing to see if I can delete it. I'd rather do that for now than delete something else I (or a user) created in the database, but it's not essential-- we could test deleting anything 
 
-            // Create a new coffee in the db
+            // Create new in the db
             PaymentType newPmtType = await CreateDummyPaymentType();
 
             // Delete it
@@ -125,7 +125,7 @@ namespace BangazonAPITest
             using (var client = new APIClientProvider().Client)
             {
 
-                // Try to get all of the coffees from /api/PaymentType
+                // Try to get all from /api/PaymentType
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -135,7 +135,7 @@ namespace BangazonAPITest
                 // Convert from JSON to C#
                 List<PaymentType> PaymentType = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
 
-                // Make sure we got back a 200 OK Status and that there are more than 0 coffees in our database
+                // Make sure we got back a 200 OK Status and that there are more than 0 things in our database
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(PaymentType.Count > 0);
 
@@ -147,7 +147,7 @@ namespace BangazonAPITest
         {
             using (HttpClient client = new APIClientProvider().Client)
             {
-                // Create a dummy coffee
+                // Create a dummy 
                 PaymentType newPmtType = await CreateDummyPaymentType();
 
                 // Try to get it
@@ -164,7 +164,7 @@ namespace BangazonAPITest
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.Equal(dummyPaymentType.name, PaymentTypeFromDB.name);
 
-                // Clean up after ourselves-- delete the dummy coffee we just created
+                // Clean up after ourselves-- delete the dummy  we just created
                 await deleteDummyPaymentType(PaymentTypeFromDB);
 
             }

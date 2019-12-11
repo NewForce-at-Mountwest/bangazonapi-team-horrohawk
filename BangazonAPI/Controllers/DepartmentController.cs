@@ -97,10 +97,10 @@ namespace BangazonAPI.Controllers
                                 departments.Add(singleDept);
                             }
                         }
-                        //else
-                        //{
-                        //    departments.Add(singleDept);
-                        //}
+                        else
+                        {
+                            departments.Add(singleDept);
+                        }
 
 
                     }
@@ -151,10 +151,9 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    cmd.CommandText = @"INSERT INTO Department (Id, Name, Budget)
+                    cmd.CommandText = @"INSERT INTO Department (Name, Budget)
                                         OUTPUT INSERTED.Id
-                                        VALUES (@id, @name, @budget)";
-                    cmd.Parameters.Add(new SqlParameter("@id", department.id));
+                                        VALUES (@name, @budget)";
                     cmd.Parameters.Add(new SqlParameter("@name", department.name));
                     cmd.Parameters.Add(new SqlParameter("@budget", department.budget));
 
@@ -176,11 +175,10 @@ namespace BangazonAPI.Controllers
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
                         cmd.CommandText = @"UPDATE Department
-                                            SET Id = @id,
-                                                Name = @name,
+                                            SET Name = @name,
                                                 Budget = @budget
                                             WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", department.id));
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
                         cmd.Parameters.Add(new SqlParameter("@name", department.name));
                         cmd.Parameters.Add(new SqlParameter("@budget", department.budget));
 
