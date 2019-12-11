@@ -165,7 +165,10 @@ namespace BangazonAPI.Controllers
             }
         }
 
-
+        // delete the product type only of there are no associated products
+        // check to see if the product type by id includes any products
+        // if products exist with product type then send error message
+        // if no associated products exist then delete the product type
 
         private bool ProductTypeExists(int id)
         {
