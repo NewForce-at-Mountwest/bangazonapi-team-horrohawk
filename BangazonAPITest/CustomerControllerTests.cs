@@ -90,28 +90,7 @@ namespace BangazonAPITest
             }
 
         }
-        [Fact]
-
-        public async Task Delete_Customer()
-        {
-            // Note: with many of these methods, I'm creating dummy data and then testing to see if I can delete it. I'd rather do that for now than delete something else I (or a user) created in the database, but it's not essential-- we could test deleting anything 
-
-            // Create a new customer in the db
-            Customer newJoeCustomer = await CreateDummyCustomer();
-
-            // Delete it
-            await deleteDummyCustomer(newJoeCustomer);
-
-            using (var client = new APIClientProvider().Client)
-            {
-                // Try to get it again
-                HttpResponseMessage response = await client.GetAsync($"{url}{newJoeCustomer.id}");
-
-                // Make sure it's really gone
-                Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
-
-            }
-        }
+        
         // test to get all customers
         [Fact]
         public async Task Get_All_Customer()
@@ -166,7 +145,7 @@ namespace BangazonAPITest
             }
         }
         [Fact]
-        public async Task Update_Student()
+        public async Task Update_Customer()
         {
 
             using (var client = new APIClientProvider().Client)
@@ -174,7 +153,7 @@ namespace BangazonAPITest
                 // Create a dummy customer
                 Customer newJoeCustomer = await CreateDummyCustomer();
 
-                // Make a new title and assign it to our dummy student
+                // Make a new title and assign it to our dummy customer
                 string newFirstName = "JOEY MCFRENCH ROAST";
                 newJoeCustomer.firstName = newFirstName;
 

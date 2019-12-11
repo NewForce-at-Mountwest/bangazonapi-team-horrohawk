@@ -52,13 +52,13 @@ Product.Id AS 'Product Id', Product.Title, Product.Description, Product.Quantity
                     //query to bring back list of payment types with cutomer if include=payments
                     if (include == "payments")
                     {
-                      query = @"SELECT Customer.Id AS 'Customer Id', Customer.FirstName, Customer.LastName,
+                        query = @"SELECT Customer.Id AS 'Customer Id', Customer.FirstName, Customer.LastName,
 PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FROM Customer JOIN PaymentType ON PaymentType.CustomerId = Customer.Id";
-                   }
+                    }
                     //query to find any customer property based on q parameters
-                    if (q!=null)
+                    if (q != null)
                     {
-                        query = @"SELECT Customer.FirstName, Customer.LastName FROM Customer WHERE Customer.FirstName LIKE '{%q%}' OR Customer.LastName LIKE '{%q%}'";
+                        query = $"SELECT Customer.Id AS 'Customer Id', Customer.FirstName, Customer.LastName FROM Customer WHERE Customer.FirstName LIKE '%{q}%' OR Customer.LastName LIKE '%{q}%'";
                     }
 
                     cmd.CommandText = query;
@@ -74,7 +74,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             lastName = reader.GetString(reader.GetOrdinal("LastName"))
                         };
 
-                       //if query include = product then run second query to retrieve products assigned information back
+                        //if query include = product then run second query to retrieve products assigned information back
                         if (include == "products")
                         {
                             Product currentProduct = new Product
@@ -87,7 +87,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             };
 
                             //if customer is on the list do not add again
-                            if (customers.Any(customer =>customer.id == currentCustomer.id))
+                            if (customers.Any(customer => customer.id == currentCustomer.id))
 
                             {
                                 Customer thisCustomer = customers.Where(c => c.id == currentCustomer.id).FirstOrDefault();
@@ -95,8 +95,8 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             }
                             else
 
-                           {
-                               currentCustomer.productsForSale.Add(currentProduct);
+                            {
+                                currentCustomer.productsForSale.Add(currentProduct);
                                 customers.Add(currentCustomer);
                             }
                         }
@@ -123,8 +123,8 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                                 currentCustomer.paymentTypes.Add(currentPayment);
                                 customers.Add(currentCustomer);
                             }
-                            
-                              }
+
+                        }
                         else
                         {
                             //add customers to list of customers
@@ -132,11 +132,13 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                         }
                     }
                     reader.Close();
-
+                    //return a list of customers
                     return Ok(customers);
                 }
             }
         }
+
+        // get one customer from the database by id and route 
 
         [HttpGet("{id}", Name = "GetCustomer")]
         public async Task<IActionResult> Get([FromRoute] int id)
@@ -146,6 +148,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
+                    //query to find the single customer by id
                     cmd.CommandText = @"
                         SELECT
                             Id, FirstName, LastName
@@ -163,15 +166,15 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             id = reader.GetInt32(reader.GetOrdinal("Id")),
                             firstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             lastName = reader.GetString(reader.GetOrdinal("LastName"))
-                                                   };
+                        };
                     }
                     reader.Close();
-
+                    //return the single customer by id
                     return Ok(customer);
                 }
             }
         }
-
+        // Post a new customer to the database
         [HttpPost]
         public async Task<IActionResult> Post([FromBody] Customer customer)
         {
@@ -185,14 +188,16 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                                         VALUES (@FirstName, @LastName)";
                     cmd.Parameters.Add(new SqlParameter("@Firstname", customer.firstName));
                     cmd.Parameters.Add(new SqlParameter("@LastName", customer.lastName));
-                   
 
+                    //give the new customer an id
                     int newId = (int)cmd.ExecuteScalar();
                     customer.id = newId;
                     return CreatedAtRoute("GetCustomer", new { id = newId }, customer);
                 }
             }
         }
+
+        //edit the customer by customer id
 
         [HttpPut("{id}")]
         public async Task<IActionResult> Put([FromRoute] int id, [FromBody] Customer customer)
@@ -234,44 +239,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
             }
         }
 
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> Delete([FromRoute] int id)
-        {
-            try
-            {
-                using (SqlConnection conn = Connection)
-                {
-                    conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())
-                    {
-                        //if object to delete has other dependencies throw error message
-
-                        //if object to delete does not have any dependencies DELETE
-
-                        cmd.CommandText = @"DELETE FROM Customer WHERE Id = @id";
-                        cmd.Parameters.Add(new SqlParameter("@id", id));
-
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
-                        {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
-                        }
-                        throw new Exception("No rows affected");
-                    }
-                }
-            }
-            catch (Exception)
-            {
-                if (!CustomerExists(id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
-        }
+      //method to check for existing customer in the database
 
         private bool CustomerExists(int id)
         {
