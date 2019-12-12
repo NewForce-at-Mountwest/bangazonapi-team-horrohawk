@@ -49,7 +49,7 @@ namespace BangazonAPITest
                 return newlyCreatedProductType;
             }
         }
-        // Reusable method to deelte a product type from the database
+        // Reusable method to delete a product type from the database
         public async Task deleteDummyProductType(ProductType productTypeToDelete)
         {
             using (HttpClient client = new APIClientProvider().Client)
