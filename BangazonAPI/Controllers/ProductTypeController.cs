@@ -182,25 +182,30 @@ namespace BangazonAPI.Controllers
 
                         cmd.CommandText = @"SELECT ProductType.Id AS 'ProductType Id', Product.Id AS 'Product Id', Product.ProductTypeId
                         FROM ProductType JOIN Product ON Product.ProductTypeId = ProductType.Id WHERE ProductTypeId = @id ";
+
                         cmd.Parameters.Add(new SqlParameter("@id", id));
+
                         SqlDataReader reader = cmd.ExecuteReader();
 
 
                         if ((reader.Read()))
 
+
                         //throw error
                         {
                             throw new Exception("Cannot delete this item");
+
                         }
                         else
 
                         // if no associated products exist then delete the product type
 
                         {
-                            cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
-                            cmd.Parameters.Add(new SqlParameter("@id", id));
+                            cmd.CommandText = @"DELETE FROM ProductType WHERE Id = @id";
+                        }
+                        reader.Close();
 
-                            int rowsAffected = cmd.ExecuteNonQuery();
+                        int rowsAffected = cmd.ExecuteNonQuery();
                             if (rowsAffected > 0)
                             {
                                 return new StatusCodeResult(StatusCodes.Status204NoContent);
@@ -209,7 +214,7 @@ namespace BangazonAPI.Controllers
                         }
 
                     }
-                }
+                
             }
             catch (Exception)
             {
