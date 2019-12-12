@@ -10,52 +10,51 @@ using System.Collections.Generic;
 
 namespace BangazonAPITest
 {
-    public class PaymentTypeControllerTest
+    public class DepartmentControllerTest
     {
         // This is going to be our test instance that we create and delete
-        private PaymentType dummyPaymentType { get; } = new PaymentType
+        private Department dummyDepartment { get; } = new Department
         {
-            name = "Mock CC",
-            accountNumber = 789465893,
-            customerId = 1
+            name = "Rock Media",
+            budget = 789465893
         };
         // We'll store our base url for this route as a private field to avoid typos
-        private string url { get; } = "/api/PaymentType";
+        private string url { get; } = "/api/Department";
 
 
-        // Reusable method to create a new PaymentType in the db and return it
-        public async Task<PaymentType> CreateDummyPaymentType()
+        // Reusable method to create a new Department in the db and return it
+        public async Task<Department> CreateDummyDepartment()
         {
 
             using (var client = new APIClientProvider().Client)
             {
 
                 // Serialize the C# object into a JSON string
-                string pmtTypeAsJSON = JsonConvert.SerializeObject(dummyPaymentType);
+                string deptAsJSON = JsonConvert.SerializeObject(dummyDepartment);
 
 
                 // Use the client to send the request and store the response
                 HttpResponseMessage response = await client.PostAsync(
                     url,
-                    new StringContent(pmtTypeAsJSON, Encoding.UTF8, "application/json")
+                    new StringContent(deptAsJSON, Encoding.UTF8, "application/json")
                 );
 
                 // Store the JSON body of the response
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Deserialize the JSON into an instance of Cohort
-                PaymentType newlyCreatedPaymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+                Department newlyCreatedDepartment = JsonConvert.DeserializeObject<Department>(responseBody);
 
-                return newlyCreatedPaymentType;
+                return newlyCreatedDepartment;
             }
         }
 
-        // Reusable method to delete a PaymentType from the database
-        public async Task deleteDummyPaymentType(PaymentType PaymentTypeToDelete)
+        // Reusable method to delete a Department from the database
+        public async Task deleteDummyDepartment(Department DepartmentToDelete)
         {
             using (HttpClient client = new APIClientProvider().Client)
             {
-                HttpResponseMessage deleteResponse = await client.DeleteAsync($"{url}/{PaymentTypeToDelete.id}");
+                HttpResponseMessage deleteResponse = await client.DeleteAsync($"{url}/{DepartmentToDelete.id}");
 
             }
 
@@ -66,29 +65,29 @@ namespace BangazonAPITest
 
 
         [Fact]
-        public async Task Create_PaymentType()
+        public async Task Create_Department()
         {
             using (var client = new APIClientProvider().Client)
             {
                 // Create new in the db
-                PaymentType newPmtType = await CreateDummyPaymentType();
+                Department deptType = await CreateDummyDepartment();
 
                 // Try to get it again
-                HttpResponseMessage response = await client.GetAsync($"{url}/{newPmtType.id}");
+                HttpResponseMessage response = await client.GetAsync($"{url}/{deptType.id}");
                 response.EnsureSuccessStatusCode();
 
                 // Turn the response into JSON
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Turn the JSON into C#
-                PaymentType newPaymentType = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+                Department newDepartment = JsonConvert.DeserializeObject<Department>(responseBody);
 
                 // Make sure it's really there
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(dummyPaymentType.name, newPmtType.name);
+                Assert.Equal(dummyDepartment.name, deptType.name);
 
                 // Clean up after ourselves
-                await deleteDummyPaymentType(newPmtType);
+                await deleteDummyDepartment(deptType);
 
             }
 
@@ -97,20 +96,20 @@ namespace BangazonAPITest
 
         [Fact]
 
-        public async Task Delete_PaymentType()
+        public async Task Delete_Department()
         {
             // Note: with many of these methods, I'm creating dummy data and then testing to see if I can delete it. I'd rather do that for now than delete something else I (or a user) created in the database, but it's not essential-- we could test deleting anything 
 
-            // Create new in the db
-            PaymentType newPmtType = await CreateDummyPaymentType();
+            // Create new  in the db
+            Department deptType = await CreateDummyDepartment();
 
             // Delete it
-            await deleteDummyPaymentType(newPmtType);
+            await deleteDummyDepartment(deptType);
 
             using (var client = new APIClientProvider().Client)
             {
                 // Try to get it again
-                HttpResponseMessage response = await client.GetAsync($"{url}{newPmtType.id}");
+                HttpResponseMessage response = await client.GetAsync($"{url}{deptType.id}");
 
                 // Make sure it's really gone
                 Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
@@ -119,13 +118,13 @@ namespace BangazonAPITest
         }
 
         [Fact]
-        public async Task Get_All_PaymentTypes()
+        public async Task Get_All_Departments()
         {
 
             using (var client = new APIClientProvider().Client)
             {
 
-                // Try to get all from /api/PaymentType
+                // Try to get all from /api/Department
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -133,39 +132,39 @@ namespace BangazonAPITest
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Convert from JSON to C#
-                List<PaymentType> PaymentType = JsonConvert.DeserializeObject<List<PaymentType>>(responseBody);
+                List<Department> Department = JsonConvert.DeserializeObject<List<Department>>(responseBody);
 
                 // Make sure we got back a 200 OK Status and that there are more than 0 things in our database
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.True(PaymentType.Count > 0);
+                Assert.True(Department.Count > 0);
 
             }
         }
 
         [Fact]
-        public async Task Get_Single_PaymentType()
+        public async Task Get_Single_Department()
         {
             using (HttpClient client = new APIClientProvider().Client)
             {
                 // Create a dummy 
-                PaymentType newPmtType = await CreateDummyPaymentType();
+                Department deptType = await CreateDummyDepartment();
 
                 // Try to get it
-                HttpResponseMessage response = await client.GetAsync($"{url}/{newPmtType.id}");
+                HttpResponseMessage response = await client.GetAsync($"{url}/{deptType.id}");
                 response.EnsureSuccessStatusCode();
 
                 // Turn the response into JSON
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Turn the JSON into C#
-                PaymentType PaymentTypeFromDB = JsonConvert.DeserializeObject<PaymentType>(responseBody);
+                Department DepartmentFromDB = JsonConvert.DeserializeObject<Department>(responseBody);
 
                 // Did we get back what we expected to get back? 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(dummyPaymentType.name, PaymentTypeFromDB.name);
+                Assert.Equal(dummyDepartment.name, DepartmentFromDB.name);
 
                 // Clean up after ourselves-- delete the dummy  we just created
-                await deleteDummyPaymentType(PaymentTypeFromDB);
+                await deleteDummyDepartment(DepartmentFromDB);
 
             }
         }
@@ -174,25 +173,25 @@ namespace BangazonAPITest
 
 
         [Fact]
-        public async Task Update_PaymentType()
+        public async Task Update_Department()
         {
 
             using (var client = new APIClientProvider().Client)
             {
                 // Create a dummy 
-                PaymentType newPmtType = await CreateDummyPaymentType();
+                Department deptType = await CreateDummyDepartment();
 
                 // Make a new title and assign it to our dummy 
-                string newName = "newPmt";
-                newPmtType.name = newName;
+                string newName = "dept";
+                deptType.name = newName;
 
                 // Convert it to JSON
-                string modifiedPmtTypeAsJSON = JsonConvert.SerializeObject(newPmtType);
+                string modifiedDeptAsJSON = JsonConvert.SerializeObject(deptType);
 
                 // Try to PUT the newly edited 
                 var response = await client.PutAsync(
-                    $"{url}/{newPmtType.id}",
-                    new StringContent(modifiedPmtTypeAsJSON, Encoding.UTF8, "application/json")
+                    $"{url}/{deptType.id}",
+                    new StringContent(modifiedDeptAsJSON, Encoding.UTF8, "application/json")
                 );
 
                 // See what comes back from the PUT. Is it a 204? 
@@ -200,26 +199,26 @@ namespace BangazonAPITest
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
                 // Get the edited item back from the database after the PUT
-                var getModifiedPmtType = await client.GetAsync($"{url}/{newPmtType.id}");
-                getModifiedPmtType.EnsureSuccessStatusCode();
+                var getModifiedDept = await client.GetAsync($"{url}/{deptType.id}");
+                getModifiedDept.EnsureSuccessStatusCode();
 
                 // Convert it to JSON
-                string getPaymentTypeBody = await getModifiedPmtType.Content.ReadAsStringAsync();
+                string getDepartmentBody = await getModifiedDept.Content.ReadAsStringAsync();
 
                 // Convert it from JSON to C#
-                PaymentType newlyEditedPmtType = JsonConvert.DeserializeObject<PaymentType>(getPaymentTypeBody);
+                Department newlyEditedDept = JsonConvert.DeserializeObject<Department>(getDepartmentBody);
 
                 // Make sure the title was modified correctly
-                Assert.Equal(HttpStatusCode.OK, getModifiedPmtType.StatusCode);
-                Assert.Equal(newName, newlyEditedPmtType.name);
+                Assert.Equal(HttpStatusCode.OK, getModifiedDept.StatusCode);
+                Assert.Equal(newName, newlyEditedDept.name);
 
                 // Clean up after yourself
-                await deleteDummyPaymentType(newlyEditedPmtType);
+                await deleteDummyDepartment(newlyEditedDept);
             }
         }
 
         [Fact]
-        public async Task Test_Get_NonExitant_PaymentType_Fails()
+        public async Task Test_Get_NonExitant_Department_Fails()
         {
 
             using (var client = new APIClientProvider().Client)
@@ -233,7 +232,7 @@ namespace BangazonAPITest
         }
 
         [Fact]
-        public async Task Test_Delete_NonExistent_PaymentType_Fails()
+        public async Task Test_Delete_NonExistent_Department_Fails()
         {
             using (var client = new APIClientProvider().Client)
             {

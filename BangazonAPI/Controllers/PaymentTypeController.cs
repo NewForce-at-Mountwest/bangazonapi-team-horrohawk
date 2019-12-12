@@ -177,14 +177,14 @@ namespace BangazonAPI.Controllers
                         cmd.CommandText = @"SELECT[Order].PaymentTypeId AS 'Order PmtType Id' FROM[Order] WHERE[Order].PaymentTypeId = @id";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
                         SqlDataReader reader = cmd.ExecuteReader();
-                        
+
 
                         if (reader.Read())
                         {
                             //throw error
                             throw new Exception("Cannot Delete This One");
                         }
-                        
+
                         else
                         {
                             //DELETE IT
