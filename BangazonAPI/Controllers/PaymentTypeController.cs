@@ -191,7 +191,6 @@ namespace BangazonAPI.Controllers
                             cmd.CommandText = @"DELETE FROM PaymentType WHERE Id=@id";
                         }
                         reader.Close();
-                        //cmd.Parameters.Add(new SqlParameter("@id", id));
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
