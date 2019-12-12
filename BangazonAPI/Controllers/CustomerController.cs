@@ -58,7 +58,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                     //query to find any customer property based on q parameters
                     if (q!=null)
                     {
-                        query = @"SELECT Customer.FirstName, Customer.LastName FROM Customer WHERE Customer.FirstName LIKE '{%q%}' OR Customer.LastName LIKE '{%q%}'";
+                        query = $"SELECT Customer.Id AS 'Customer Id', Customer.FirstName, Customer.LastName FROM Customer WHERE Customer.FirstName LIKE '%{q}%' OR Customer.LastName LIKE '%{q}%'";
                     }
 
                     cmd.CommandText = query;
@@ -73,9 +73,12 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             firstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             lastName = reader.GetString(reader.GetOrdinal("LastName"))
                         };
-                        if(include == null)
+                        
+                        if (include== null)
                         {
+                            //add customers to list of customers
                             customers.Add(currentCustomer);
+
                         }
                         //if query include = product then run second query to retrieve products assigned information back
                         if (include == "products")
@@ -99,7 +102,8 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             else
 
                            {
-                                //currentCustomer.productsForSale.Add(currentProduct);
+                                currentCustomer.productsForSale.Add(currentProduct);
+                                //add customers to list of customers
                                 customers.Add(currentCustomer);
 
                             }
@@ -128,12 +132,15 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                                 customers.Add(currentCustomer);
                             }
                             
-                              }
-                        //else
-                        //{
-                        //    //add customers to list of customers
+                                                   }
+                        ////if query by string add to the list
+                        //if (q != null)
+                        //{  //add customers to list of customers
                         //    customers.Add(currentCustomer);
+
                         //}
+
+
                     }
                     reader.Close();
 
