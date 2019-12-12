@@ -176,25 +176,40 @@ namespace BangazonAPI.Controllers
                 using (SqlConnection conn = Connection)
                 {
                     conn.Open();
-                    using (SqlCommand cmd = conn.CreateCommand())    
+                    using (SqlCommand cmd = conn.CreateCommand())
+                    {
                         // if products exist with product type then send error message
 
                         cmd.CommandText = @"SELECT ProductType.Id AS 'ProductType Id', Product.Id AS 'Product Id', Product.ProductTypeId
-FROM ProductType JOIN Product ON Product.ProductTypeId = ProductType.Id WHERE ProductTypeId = id ";
-
-                    // if no associated products exist then delete the product type
-
-                    cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
+                        FROM ProductType JOIN Product ON Product.ProductTypeId = ProductType.Id WHERE ProductTypeId = @id ";
                         cmd.Parameters.Add(new SqlParameter("@id", id));
+                        SqlDataReader reader = cmd.ExecuteReader();
 
-                        int rowsAffected = cmd.ExecuteNonQuery();
-                        if (rowsAffected > 0)
+
+                        if ((reader.Read()))
+
+                        //throw error
                         {
-                            return new StatusCodeResult(StatusCodes.Status204NoContent);
+                            throw new Exception("Cannot delete this item");
                         }
-                        throw new Exception("No rows affected");
-                 }
-                
+                        else
+
+                        // if no associated products exist then delete the product type
+
+                        {
+                            cmd.CommandText = @"DELETE FROM Student WHERE Id = @id";
+                            cmd.Parameters.Add(new SqlParameter("@id", id));
+
+                            int rowsAffected = cmd.ExecuteNonQuery();
+                            if (rowsAffected > 0)
+                            {
+                                return new StatusCodeResult(StatusCodes.Status204NoContent);
+                            }
+                            throw new Exception("No rows affected");
+                        }
+
+                    }
+                }
             }
             catch (Exception)
             {
