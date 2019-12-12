@@ -129,7 +129,7 @@ Id INTEGER NOT NULL PRIMARY KEY IDENTITY,
 OrderId INTEGER NOT NULL,
 ProductId INTEGER NOT NULL,
 CONSTRAINT FK_OrderProduct_Product FOREIGN KEY(ProductId) REFERENCES Product(Id),
-CONSTRAINT FK_OrderProduct_Order FOREIGN KEY(OrderId) REFERENCES Order
+CONSTRAINT FK_OrderProduct_Order FOREIGN KEY(OrderId) REFERENCES [Order]
 );
 INSERT INTO Computer (PurchaseDate, Make, Manufacturer) VALUES ('06/26/1982','Latitude', 'Dell')
 INSERT INTO Computer (PurchaseDate, Make, Manufacturer) VALUES ('04/16/1999','Inspiron', 'Dell')
