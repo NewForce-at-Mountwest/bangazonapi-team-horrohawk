@@ -12,9 +12,11 @@ namespace BangazonAPI.Models
         public string title { get; set; }
         public string description { get; set; }
         public int quantity { get; set; }
-        public ProductType productType { get; set; }
-        public Customer customer { get; set; }
         public int productTypeId { get; set; }
         public int customerId { get; set; }
+
+        public ProductType ProductType { get; set; }
+        public Customer customer { get; set; }
+      
     }
 }

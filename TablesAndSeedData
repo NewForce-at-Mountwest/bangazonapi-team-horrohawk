@@ -159,5 +159,5 @@ INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, Description, Quant
 INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, Description, Quantity) VALUES (1, 2, 3.99, 'Dawn Dish Soap', 'Takes grease out of the way', 1)
 INSERT INTO Product (ProductTypeId, CustomerId, Price, Title, Description, Quantity) VALUES (3, 1, 6.99, 'Sandals', 'Beach Shoes', 1)
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (2, 1)
-INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, 2)
+INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, Null)
 INSERT INTO [Order] (CustomerId, PaymentTypeId) VALUES (1, 1)
