@@ -52,9 +52,9 @@ namespace BangazonAPI.Controllers
                             customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
 
                         };
-                        
-                            paymentTypes.Add(currentpaymentType);
-                        
+
+                        paymentTypes.Add(currentpaymentType);
+
 
                     }
                     reader.Close();
@@ -173,11 +173,25 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        //SELECT[Order].PaymentTypeId AS 'Order PmtType Id' FROM[Order] WHERE[Order].PaymentTypeId = 1
-                        cmd.CommandText = @"DELETE FROM PaymentType WHERE Id = @id and PaymentType.CustomerId=null and [Order].PaymentTypeId != @id";
+                        //FIND any instances of connections to other tables
+                        cmd.CommandText = @"SELECT[Order].PaymentTypeId AS 'Order PmtType Id' FROM[Order] WHERE[Order].PaymentTypeId = @id";
+                        cmd.Parameters.Add(new SqlParameter("@id", id));
+                        SqlDataReader reader = cmd.ExecuteReader();
                         
-                    cmd.Parameters.Add(new SqlParameter("@id", id));
 
+                        if (reader.Read())
+                        {
+                            //throw error
+                            throw new Exception("Cannot Delete This One");
+                        }
+                        
+                        else
+                        {
+                            //DELETE IT
+                            cmd.CommandText = @"DELETE FROM PaymentType WHERE Id=@id";
+                        }
+                        reader.Close();
+                        //cmd.Parameters.Add(new SqlParameter("@id", id));
                         int rowsAffected = cmd.ExecuteNonQuery();
                         if (rowsAffected > 0)
                         {
