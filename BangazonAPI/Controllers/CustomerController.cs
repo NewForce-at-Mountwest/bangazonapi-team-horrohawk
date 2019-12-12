@@ -73,8 +73,11 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             firstName = reader.GetString(reader.GetOrdinal("FirstName")),
                             lastName = reader.GetString(reader.GetOrdinal("LastName"))
                         };
-
-                       //if query include = product then run second query to retrieve products assigned information back
+                        if(include == null)
+                        {
+                            customers.Add(currentCustomer);
+                        }
+                        //if query include = product then run second query to retrieve products assigned information back
                         if (include == "products")
                         {
                             Product currentProduct = new Product
@@ -96,8 +99,9 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             else
 
                            {
-                               currentCustomer.productsForSale.Add(currentProduct);
+                                //currentCustomer.productsForSale.Add(currentProduct);
                                 customers.Add(currentCustomer);
+
                             }
                         }
                         // if query include= paymentType bring back all customers with list of payment types
@@ -125,11 +129,11 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             }
                             
                               }
-                        else
-                        {
-                            //add customers to list of customers
-                            customers.Add(currentCustomer);
-                        }
+                        //else
+                        //{
+                        //    //add customers to list of customers
+                        //    customers.Add(currentCustomer);
+                        //}
                     }
                     reader.Close();
 
