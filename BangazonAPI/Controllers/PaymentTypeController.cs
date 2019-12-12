@@ -173,8 +173,7 @@ namespace BangazonAPI.Controllers
                     conn.Open();
                     using (SqlCommand cmd = conn.CreateCommand())
                     {
-                        //SELECT[Order].PaymentTypeId AS 'Order PmtType Id' FROM[Order] WHERE[Order].PaymentTypeId = 1
-                        cmd.CommandText = @"DELETE FROM PaymentType WHERE Id = @id and PaymentType.CustomerId=null and [Order].PaymentTypeId != @id";
+                        cmd.CommandText = @"DELETE FROM PaymentType WHERE Id = @id";
                         
                     cmd.Parameters.Add(new SqlParameter("@id", id));
 
