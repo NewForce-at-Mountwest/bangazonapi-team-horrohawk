@@ -43,13 +43,13 @@ namespace BangazonAPITest
                 // Store the JSON body of the response
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                // Deserialize the JSON into an instance of Student
+                // Deserialize the JSON into an instance of Customer
                 Customer newlyCreatedCustomer = JsonConvert.DeserializeObject<Customer>(responseBody);
 
                 return newlyCreatedCustomer;
             }
         }
-        // Reusable method to deelte a customer from the database
+        // Reusable method to delete a customer from the database
         public async Task deleteDummyCustomer(Customer customerToDelete)
         {
             using (HttpClient client = new APIClientProvider().Client)
@@ -120,7 +120,7 @@ namespace BangazonAPITest
             using (var client = new APIClientProvider().Client)
             {
 
-                // Try to get all of the students from /api/customer
+                // Try to get all of the customers from /api/customer
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -130,7 +130,7 @@ namespace BangazonAPITest
                 // Convert from JSON to C#
                 List<Customer> customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
 
-                // Make sure we got back a 200 OK Status and that there are more than 0 coffees in our database
+                // Make sure we got back a 200 OK Status and that there are more than 0 customers in our database
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(customers.Count > 0);
 
@@ -166,7 +166,7 @@ namespace BangazonAPITest
             }
         }
         [Fact]
-        public async Task Update_Student()
+        public async Task Update_Customer()
         {
 
             using (var client = new APIClientProvider().Client)
@@ -174,7 +174,7 @@ namespace BangazonAPITest
                 // Create a dummy customer
                 Customer newJoeCustomer = await CreateDummyCustomer();
 
-                // Make a new title and assign it to our dummy student
+                // Make a new title and assign it to our dummy customer
                 string newFirstName = "JOEY MCFRENCH ROAST";
                 newJoeCustomer.firstName = newFirstName;
 
