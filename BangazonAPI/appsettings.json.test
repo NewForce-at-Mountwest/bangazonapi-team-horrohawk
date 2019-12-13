@@ -7,7 +7,7 @@
     },
     "AllowedHosts": "*",
     "ConnectionStrings": {
-      "DefaultConnection": "Server=localhost\\SQLEXPRESS01;Database=BangazonAPI;Trusted_Connection=True;"
+      "DefaultConnection": "Server=localhost\\SQLEXPRESS;Database=BangazonAPI;Trusted_Connection=True;"
     }
   }
 
