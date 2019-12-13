@@ -8,53 +8,53 @@ using System.Threading.Tasks;
 using Xunit;
 using System.Collections.Generic;
 
+
 namespace BangazonAPITest
 {
-    public class CustomerControllerTests
+    public class ProductTypeControllerTests
     {
-        // This is going to be our test customer instance that we create and delete to make sure everything works
-        private Customer dummyCustomer { get; } = new Customer
+        // This is going to be our test product type instance that we create and delete to make sure everything works
+        private ProductType dummyProductType { get; } = new ProductType
         {
-            firstName = "Joe",
-            lastName = "Latte"
-          
+           name = "Household Items"
+
         };
 
         // We'll store our base url for this route as a private field to avoid typos
-        private string url { get; } = "/api/customer";
+        private string url { get; } = "/api/productType";
 
-        // Reusable method to create a new customer in the database and return it
-        public async Task<Customer> CreateDummyCustomer()
+        // Reusable method to create a new product type in the database and return it
+        public async Task<ProductType> CreateDummyProductType()
         {
 
             using (var client = new APIClientProvider().Client)
             {
 
                 // Serialize the C# object into a JSON string
-                string JoeCustomerAsJSON = JsonConvert.SerializeObject(dummyCustomer);
+                string JoeProductTypeAsJSON = JsonConvert.SerializeObject(dummyProductType);
 
 
                 // Use the client to send the request and store the response
                 HttpResponseMessage response = await client.PostAsync(
                     url,
-                    new StringContent(JoeCustomerAsJSON, Encoding.UTF8, "application/json")
+                    new StringContent(JoeProductTypeAsJSON, Encoding.UTF8, "application/json")
                 );
 
                 // Store the JSON body of the response
                 string responseBody = await response.Content.ReadAsStringAsync();
 
-                // Deserialize the JSON into an instance of Customer
-                Customer newlyCreatedCustomer = JsonConvert.DeserializeObject<Customer>(responseBody);
+                // Deserialize the JSON into an instance of Product Type
+                ProductType newlyCreatedProductType = JsonConvert.DeserializeObject<ProductType>(responseBody);
 
-                return newlyCreatedCustomer;
+                return newlyCreatedProductType;
             }
         }
-        // Reusable method to delete a customer from the database
-        public async Task deleteDummyCustomer(Customer customerToDelete)
+        // Reusable method to delete a product type from the database
+        public async Task deleteDummyProductType(ProductType productTypeToDelete)
         {
             using (HttpClient client = new APIClientProvider().Client)
             {
-                HttpResponseMessage deleteResponse = await client.DeleteAsync($"{url}/{customerToDelete.id}");
+                HttpResponseMessage deleteResponse = await client.DeleteAsync($"{url}/{productTypeToDelete.id}");
 
             }
 
@@ -62,44 +62,43 @@ namespace BangazonAPITest
 
         //Tests START HERE
         [Fact]
-        public async Task Create_Customer()
+        public async Task Create_ProductType()
         {
             using (var client = new APIClientProvider().Client)
             {
-                // Create a new customer in the db
-               Customer newJoeCustomer = await CreateDummyCustomer();
+                // Create a new product type in the db
+                ProductType newJoeProductType = await CreateDummyProductType();
 
                 // Try to get it again
-                HttpResponseMessage response = await client.GetAsync($"{url}/{newJoeCustomer.id}");
+                HttpResponseMessage response = await client.GetAsync($"{url}/{newJoeProductType.id}");
                 response.EnsureSuccessStatusCode();
 
                 // Turn the response into JSON
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Turn the JSON into C#
-                Customer newCustomer = JsonConvert.DeserializeObject<Customer>(responseBody);
+                ProductType newProductType = JsonConvert.DeserializeObject<ProductType>(responseBody);
 
                 // Make sure it's really there
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(dummyCustomer.firstName, newCustomer.firstName);
-                Assert.Equal(dummyCustomer.lastName, newCustomer.lastName);
+                Assert.Equal(dummyProductType.name, newProductType.name);
 
                 // Clean up after ourselves
-                await deleteDummyCustomer(newCustomer);
+                await deleteDummyProductType(newProductType);
 
             }
 
         }
-        
-        // test to get all customers
+
+        // test to get all product types
         [Fact]
-        public async Task Get_All_Customer()
+        public async Task Get_All_ProductTypes()
         {
 
             using (var client = new APIClientProvider().Client)
             {
 
-                // Try to get all of the customers from /api/customer
+                // Try to get all of the product types from /api/customer
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -109,92 +108,90 @@ namespace BangazonAPITest
                 // Convert from JSON to C#
                 List<Customer> customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
 
-                // Make sure we got back a 200 OK Status and that there are more than 0 customers in our database
+                // Make sure we got back a 200 OK Status and that there are more than 0 coffees in our database
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(customers.Count > 0);
 
             }
         }
-        //Test get single customer
+        //Test get single product type
         [Fact]
-        public async Task Get_Single_Customer()
+        public async Task Get_Single_ProductType()
         {
             using (HttpClient client = new APIClientProvider().Client)
             {
-                // Create a dummy customer
-               Customer newJoeCustomer = await CreateDummyCustomer();
+                // Create a dummy product type
+                ProductType newJoeProductType = await CreateDummyProductType();
 
                 // Try to get it
-                HttpResponseMessage response = await client.GetAsync($"{url}/{newJoeCustomer.id}");
+                HttpResponseMessage response = await client.GetAsync($"{url}/{newJoeProductType.id}");
                 response.EnsureSuccessStatusCode();
 
                 // Turn the response into JSON
                 string responseBody = await response.Content.ReadAsStringAsync();
 
                 // Turn the JSON into C#
-                Customer JoeCustomerFromDB = JsonConvert.DeserializeObject<Customer>(responseBody);
+                ProductType JoeProductTypeFromDB = JsonConvert.DeserializeObject<ProductType>(responseBody);
 
                 // Did we get back what we expected to get back? 
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-                Assert.Equal(dummyCustomer.firstName, JoeCustomerFromDB.firstName);
-                Assert.Equal(dummyCustomer.lastName, JoeCustomerFromDB.lastName);
+                Assert.Equal(dummyProductType.name, JoeProductTypeFromDB.name);
 
                 // Clean up after ourselves-- delete the dummy customer we just created
-                await deleteDummyCustomer(JoeCustomerFromDB);
+                await deleteDummyProductType(JoeProductTypeFromDB);
 
             }
         }
         [Fact]
-        public async Task Update_Customer()
+        public async Task Update_ProductType()
         {
 
             using (var client = new APIClientProvider().Client)
             {
-                // Create a dummy customer
-                Customer newJoeCustomer = await CreateDummyCustomer();
+                // Create a dummy product type
+                ProductType newJoeProductType = await CreateDummyProductType();
 
-                // Make a new title and assign it to our dummy customer
-                string newFirstName = "JOEY MCFRENCH ROAST";
-                newJoeCustomer.firstName = newFirstName;
+                // Make a new title and assign it to our dummy product type
+                string newName = "JOEY MCFRENCH ROAST";
+                newJoeProductType.name = newName;
 
                 // Convert it to JSON
-                string modifiedJoeCustomerAsJSON = JsonConvert.SerializeObject(newJoeCustomer);
+                string modifiedJoeProductTypeAsJSON = JsonConvert.SerializeObject(newJoeProductType);
 
-                // Try to PUT the newly edited customer
+                // Try to PUT the newly edited product type
                 var response = await client.PutAsync(
-                    $"{url}/{newJoeCustomer.id}",
-                    new StringContent(modifiedJoeCustomerAsJSON, Encoding.UTF8, "application/json")
+                    $"{url}/{newJoeProductType.id}",
+                    new StringContent(modifiedJoeProductTypeAsJSON, Encoding.UTF8, "application/json")
                 );
 
                 // See what comes back from the PUT. Is it a 204? 
                 string responseBody = await response.Content.ReadAsStringAsync();
                 Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-                // Get the edited customer back from the database after the PUT
-                var getModifiedCustomer = await client.GetAsync($"{url}/{newJoeCustomer.id}");
-                getModifiedCustomer.EnsureSuccessStatusCode();
+                // Get the edited product type back from the database after the PUT
+                var getModifiedProductType = await client.GetAsync($"{url}/{newJoeProductType.id}");
+                getModifiedProductType.EnsureSuccessStatusCode();
 
                 // Convert it to JSON
-                string getCustomerBody = await getModifiedCustomer.Content.ReadAsStringAsync();
+                string getProductTypeBody = await getModifiedProductType.Content.ReadAsStringAsync();
 
                 // Convert it from JSON to C#
-               Customer newlyEditedCustomer = JsonConvert.DeserializeObject<Customer>(getCustomerBody);
+                ProductType newlyEditedProductType = JsonConvert.DeserializeObject<ProductType>(getProductTypeBody);
 
-                // Make sure the title was modified correctly
-                Assert.Equal(HttpStatusCode.OK, getModifiedCustomer.StatusCode);
-                Assert.Equal(newFirstName, newlyEditedCustomer.firstName);
+                // Make sure the name was modified correctly
+                Assert.Equal(HttpStatusCode.OK, getModifiedProductType.StatusCode);
 
                 // Clean up after yourself
-                await deleteDummyCustomer(newlyEditedCustomer);
+                await deleteDummyProductType(newlyEditedProductType);
             }
         }
         [Fact]
-        public async Task Test_Get_NonExitent_Customer_Fails()
+        public async Task Test_Get_NonExitent_ProductType_Fails()
         {
 
             using (var client = new APIClientProvider().Client)
             {
-                // Try to get a customer with an Id that could never exist
+                // Try to get a product type with an Id that could never exist
                 HttpResponseMessage response = await client.GetAsync($"{url}/00000000");
 
                 // It should bring back a 204 no content error
@@ -202,7 +199,7 @@ namespace BangazonAPITest
             }
         }
         [Fact]
-        public async Task Test_Delete_NonExistent_Customer_Fails()
+        public async Task Test_Delete_NonExistent_ProductType_Fails()
         {
             using (var client = new APIClientProvider().Client)
             {
@@ -213,5 +210,6 @@ namespace BangazonAPITest
                 Assert.Equal(HttpStatusCode.NotFound, deleteResponse.StatusCode);
             }
         }
+
     }
 }
