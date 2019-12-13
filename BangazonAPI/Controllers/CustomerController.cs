@@ -133,11 +133,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             }
 
                         }
-                        else
-                        {
-                            //add customers to list of customers
-                            customers.Add(currentCustomer);
-                        }
+                       
                     }
                     reader.Close();
                     //return a list of customers
