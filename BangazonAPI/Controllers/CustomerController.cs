@@ -40,14 +40,14 @@ namespace BangazonAPI.Controllers
                 conn.Open();
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
-                    //query to bring back all customers 
+                    //query to bring back all customers
                     string query = @"SELECT Customer.Id AS 'Customer Id', Customer.FirstName, Customer.LastName
 FROM Customer ";
                     // query to include products for sale by cutomer if include=product
                     if (include == "products")
                     {
                         query = @"SELECT Customer.Id AS 'Customer Id', Customer.FirstName, Customer.LastName,
-Product.Id AS 'Product Id', Product.Title, Product.Description, Product.Quantity  FROM Customer JOIN Product ON Product.CustomerId = Customer.Id";
+Product.Id AS 'Product Id', Product.Title, Product.Description, Product.Quantity, Product.Price  FROM Customer JOIN Product ON Product.CustomerId = Customer.Id";
                     }
                     //query to bring back list of payment types with cutomer if include=payments
                     if (include == "payments")
@@ -74,6 +74,12 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             lastName = reader.GetString(reader.GetOrdinal("LastName"))
                         };
 
+                        if (include== null)
+                        {
+                            //add customers to list of customers
+                            customers.Add(currentCustomer);
+
+                        }
                         //if query include = product then run second query to retrieve products assigned information back
                         if (include == "products")
                         {
@@ -81,7 +87,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             {
                                 id = reader.GetInt32(reader.GetOrdinal("Product Id")),
                                 title = reader.GetString(reader.GetOrdinal("Title")),
-                                price = reader.GetInt32(reader.GetOrdinal("Price")),
+                                price = reader.GetDecimal(reader.GetOrdinal("Price")),
                                 quantity = reader.GetInt32(reader.GetOrdinal("Quantity")),
                                 description = reader.GetString(reader.GetOrdinal("Description"))
                             };
@@ -95,9 +101,11 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
                             }
                             else
 
-                            {
+                           {
                                 currentCustomer.productsForSale.Add(currentProduct);
+                                //add customers to list of customers
                                 customers.Add(currentCustomer);
+
                             }
                         }
                         // if query include= paymentType bring back all customers with list of payment types
@@ -138,7 +146,7 @@ PaymentType.Id AS 'PaymentType Id', PaymentType.Name, PaymentType.AcctNumber FRO
             }
         }
 
-        // get one customer from the database by id and route 
+        // get one customer from the database by id and route
 
         [HttpGet("{id}", Name = "GetCustomer")]
         public async Task<IActionResult> Get([FromRoute] int id)

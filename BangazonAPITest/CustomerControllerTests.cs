@@ -49,7 +49,7 @@ namespace BangazonAPITest
                 return newlyCreatedCustomer;
             }
         }
-        // Reusable method to deelte a customer from the database
+        // Reusable method to delete a customer from the database
         public async Task deleteDummyCustomer(Customer customerToDelete)
         {
             using (HttpClient client = new APIClientProvider().Client)
@@ -99,7 +99,7 @@ namespace BangazonAPITest
             using (var client = new APIClientProvider().Client)
             {
 
-                // Try to get all of the students from /api/customer
+                // Try to get all of the customers from /api/customer
                 HttpResponseMessage response = await client.GetAsync(url);
                 response.EnsureSuccessStatusCode();
 
@@ -109,7 +109,7 @@ namespace BangazonAPITest
                 // Convert from JSON to C#
                 List<Customer> customers = JsonConvert.DeserializeObject<List<Customer>>(responseBody);
 
-                // Make sure we got back a 200 OK Status and that there are more than 0 coffees in our database
+                // Make sure we got back a 200 OK Status and that there are more than 0 customers in our database
                 Assert.Equal(HttpStatusCode.OK, response.StatusCode);
                 Assert.True(customers.Count > 0);
 
