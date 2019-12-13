@@ -38,7 +38,7 @@ namespace BangazonAPI.Controllers
             using (SqlConnection conn = Connection)
             {
                 conn.Open();
-                                                          
+
                 using (SqlCommand cmd = conn.CreateCommand())
                 {
                     string command = "";
@@ -66,7 +66,7 @@ namespace BangazonAPI.Controllers
                         command = $@"SELECT Id, CustomerId, PaymentTypeId                                     
                        FROM [Order]";
 
-                      
+
                     }
 
 
@@ -77,21 +77,36 @@ namespace BangazonAPI.Controllers
                     while (reader.Read())
                     {
 
-                        Order currentOrder = new Order
+                        DBNull paymentTypeId = null;
+                        if (paymentTypeId == DBNull.Value)
+
+                        { Order currentOpenOrder = new Order
                         {
                             id = reader.GetInt32(reader.GetOrdinal("Id")),
-                            customerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
-                            paymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                            customerId = reader.GetInt32(reader.GetOrdinal("CustomerId"))
                         };
-                        orders.Add(currentOrder);
-                    }
-                    
-                    reader.Close();
+                            orders.Add(currentOpenOrder);
+                        }
+                        else
+                        {
 
-                    return Ok(orders);
+                            Order currentOrder = new Order
+                            {
+                                id = reader.GetInt32(reader.GetOrdinal("Id")),
+                                customerId = reader.GetInt32(reader.GetOrdinal("CustomerId")),
+                                paymentTypeId = reader.GetInt32(reader.GetOrdinal("PaymentTypeId")),
+                            };
+                            orders.Add(currentOrder);
+                        }
+                    }
+
+                        reader.Close();
+
+                        return Ok(orders);
+
                     
                 }
-            }
+            } 
         }
 
                                
